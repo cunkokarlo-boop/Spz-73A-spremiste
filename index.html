@@ -89,7 +89,7 @@ body{padding-bottom:76px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ===================== ULAZI (uzorak: sve mjere ovdje) =====================
-const CFG={brend:'flash',umami:'17cf6bf3-9670-45c1-8e5b-26cfcf0ec355',umamiSrc:'https://cloud.umami.is/script.js',  // umami = Website ID (prazno = bez praćenja)
+const CFG={brend:'flash',umami:'17cf6bf3-9670-45c1-8e5b-26cfcf0ec355',umamiSrc:'https://cloud.umami.is/script.js',umamiJa:'65412c8a',  // umami = Website ID (prazno = bez praćenja)
   L:4000,D:1400,nagib:2.5,                 // gabarit, kosina terena (desno niže)
   stupW:80,stupD:40,straga:[0,1960,3920],sprijeda:[0,3920],
   Nh:120,Nd:80,                                        // prednji nosač 120×80×3
@@ -335,6 +335,8 @@ if(IMA_CIJ&&skrivenaCij){$('cij').hidden=true;$('barTxt').textContent='';}
 
 // ---- PRAĆENJE (Umami, bez kolačića): uključeno samo kad je CFG.umami upisan ----
 const TRAG=(()=>{if(!CFG.umami)return{t(){}};
+  try{const q=new URLSearchParams(location.search);if(CFG.umamiJa&&q.get('nb')===CFG.umamiJa){localStorage.setItem('umami.disabled','1');q.delete('nb');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash)}
+    if(localStorage.getItem('umami.disabled')){$('nTrag').hidden=false;return{t(){}}}}catch(e){}
   const sc=document.createElement('script');sc.defer=true;sc.src=CFG.umamiSrc;sc.dataset.websiteId=CFG.umami;sc.dataset.doNotTrack='true';document.head.appendChild(sc);
   $('nTrag').hidden=false;$('sInfo').textContent='Poveznica u poruci otvara upravo ovu varijantu.';
   const red=[];const t=(n,d)=>{try{if(window.umami&&umami.track){while(red.length){const [a,b]=red.shift();umami.track(a,b)}umami.track(n,d)}else red.push([n,d])}catch(e){}};
