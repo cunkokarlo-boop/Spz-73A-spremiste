@@ -71,6 +71,7 @@ body{padding-bottom:76px}
   <section class="box" id="cij"><h2>Informativna cijena<span class="primjer" id="primjer">primjer cijena</span></h2><table id="tCij"></table><p class="mut" id="nCij" style="margin:8px 0 0"></p></section>
   <section class="box" id="stat"><h2>Statika · neslužbeni izračun</h2><p class="mut" style="margin:0 0 8px">Orijentacijski izračun za odabranu ispunu. Nije službeni statički proračun ni projekt; službeni nalaz izrađuje i potpisuje ovlašteni inženjer.</p><table id="tStat"></table><ul id="uStat" style="margin:8px 0 0;padding-left:20px"></ul></section>
 <section class="box"><h2>Ukratko</h2><ul id="ukr"></ul></section>
+<p class="mut" id="nTrag" hidden style="margin:0;font-size:14px">Stranica bez kolačića i bez osobnih podataka broji posjete i odabrane varijante radi pripreme ponude.</p>
  </div>
 </div></div>
 <div class="bar" role="status"><span id="barTxt" role="button" tabindex="0" style="cursor:pointer"></span><span style="display:flex;gap:6px"><button type="button" id="bShare" style="background:transparent;border:1px solid currentColor;color:inherit">Dijeli</button><button type="button" id="bPon">Zatraži ponudu</button></span></div>
@@ -88,7 +89,8 @@ body{padding-bottom:76px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ===================== ULAZI (uzorak: sve mjere ovdje) =====================
-const CFG={brend:'flash',L:4000,D:1400,nagib:2.5,                 // gabarit, kosina terena (desno niže)
+const CFG={brend:'flash',umami:'17cf6bf3-9670-45c1-8e5b-26cfcf0ec355',umamiSrc:'https://cloud.umami.is/script.js',  // umami = Website ID (prazno = bez praćenja)
+  L:4000,D:1400,nagib:2.5,                 // gabarit, kosina terena (desno niže)
   stupW:80,stupD:40,straga:[0,1960,3920],sprijeda:[0,3920],
   Nh:120,Nd:80,                                        // prednji nosač 120×80×3
   yStraga:1980,yNapr:2060,prepust:500,                 // vrh kostura straga / vrh prednjeg nosača; prepust krova
@@ -330,4 +332,17 @@ $('sCp').onclick=kopiraj('sCp','sTxt');$('pCp').onclick=kopiraj('pCp','pTxt');
 document.addEventListener('keydown',e=>{if(e.key==='Escape')zatvori()});
 if(izKoda(location.hash)){cur=[];ui();build()}
 if(IMA_CIJ&&skrivenaCij){$('cij').hidden=true;$('barTxt').textContent='';}
+
+// ---- PRAĆENJE (Umami, bez kolačića): uključeno samo kad je CFG.umami upisan ----
+const TRAG=(()=>{if(!CFG.umami)return{t(){}};
+  const sc=document.createElement('script');sc.defer=true;sc.src=CFG.umamiSrc;sc.dataset.websiteId=CFG.umami;sc.dataset.doNotTrack='true';document.head.appendChild(sc);
+  $('nTrag').hidden=false;$('sInfo').textContent='Poveznica u poruci otvara upravo ovu varijantu.';
+  const red=[];const t=(n,d)=>{try{if(window.umami&&umami.track){while(red.length){const [a,b]=red.shift();umami.track(a,b)}umami.track(n,d)}else red.push([n,d])}catch(e){}};
+  let zadnji='',tm=0;const var_=()=>{clearTimeout(tm);tm=setTimeout(()=>{const k=kod(true);if(k!==zadnji){zadnji=k;t('varijanta',{kod:k,opis:opisV(true).slice(0,400)})}},2500)};
+  const _b=build;build=function(){_b.apply(this,arguments);var_()};var_();
+  const jednom=(id,n)=>{const e=$(id);if(!e||!window.IntersectionObserver)return;const o=new IntersectionObserver(x=>{if(x.some(i=>i.isIntersecting)){o.disconnect();t(n)}},{threshold:.4});o.observe(e)};
+  jednom('cij','vidio-cijenu');jednom('stat','vidio-statiku');
+  [['bShare','dijeli'],['bPon','ponuda-otvori'],['pMail','ponuda-email'],['pWa','ponuda-whatsapp'],['pCp','ponuda-kopiraj'],['sWa','dijeli-whatsapp'],['sMail','dijeli-email'],['sCp','dijeli-kopiraj'],['bHelp','pomoc']].forEach(([id,n])=>{const e=$(id);if(e)e.addEventListener('click',()=>t(n,{kod:kod(true)}))});
+  document.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>t('pogled',{v:b.dataset.v})));
+  return{t}})();
 </script></body></html>
