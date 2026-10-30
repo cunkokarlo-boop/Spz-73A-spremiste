@@ -97,7 +97,7 @@ const CFG={brend:'flash',L:4000,D:1400,nagib:2.5,                 // gabarit, ko
 const CIJ={primjer:false,pdv:0.25,valuta:'€',
   m2:{kostur:345,krov:55,mreza:60,perfo:90,lamele:115,kose:140},   // €/m² bez PDV-a
   kom:{krilo:425},                                                  // sustav vrata po krilu (okvir, kotači, vodilice, boja)
-  puna:{t:'Pojačani prednji stupovi 80×80 (zatvorena ispuna)',c:80,isp:['perfo','lamele','kose']}, // statika: puna ispuna → prednji stupovi 80×80×3 (odobreno 30.10.)
+  puna:{t:'Pojačani prednji stupovi 80×80 (zatvorena ispuna)',c:80,isp:['perfo','lamele','kose'],plohe:['straga','vrata']}, // statika po plohama (kombinacije.py): 80×80×3 treba kad su straga I vrata puni (odobreno 30.10.)
   fiksno:[['Brave s cilindrom (2 kom, isti ključ)',225],['Temelj (piloti)',635],['Prijevoz i montaža',595]]}; // null = po izmjeri
 const ISP={
   mreza:{t:'Mreža',o:'Mreža u okvirima: prozračno, svijetlo, sadržaj se vidi.'},
@@ -235,7 +235,7 @@ function cijena(){const P=plohe(),rows=[];const add=(t,m2,c)=>rows.push([t,m2,c,
   add('Kostur (po m² tlocrta)',P.tlocrt,CIJ.m2.kostur);add('Krov od trapeznog lima',P.krov,CIJ.m2.krov);
   [['straga','Straga'],['lijevo','Lijevi bok'],['desno','Desni bok'],['vrata','Vrata – ispuna']].forEach(([k,t])=>add(t+' · '+ISP[cfg.isp[k]].t.toLowerCase(),P[k],CIJ.m2[cfg.isp[k]]));
   rows.push(['Sustav kliznih vrata ('+P.n+' krila)',null,null,CIJ.kom.krilo*P.n]);
-  if(Object.values(cfg.isp).some(v=>CIJ.puna.isp.includes(v)))rows.push([CIJ.puna.t,null,null,CIJ.puna.c]);
+  if(CIJ.puna.plohe.every(k=>CIJ.puna.isp.includes(cfg.isp[k])))rows.push([CIJ.puna.t,null,null,CIJ.puna.c]);
   CIJ.fiksno.forEach(([t,v])=>rows.push([t,null,null,v]));
   const sum=rows.reduce((a,r)=>a+(r[3]||0),0),otv=rows.some(r=>r[3]==null);
   $('tCij').innerHTML='<tr><th>Stavka</th><th class="n">m²</th><th class="n">Iznos</th></tr>'+rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]==null?'':r[1].toFixed(2).replace('.',',')}</td><td class="n">${eur(r[3])}</td></tr>`).join('')+
