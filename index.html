@@ -227,12 +227,12 @@ function setView(v){anim=null;sph.half=undefined;document.querySelectorAll('[dat
   if(v==='top'){tgt.set(L/2,0,900);sph={r:6400,th:0,ph:0.03};setRoof(false)}
   sph.r0=sph.r;fit()}
 // pogled na plohu kod odabira ispune: th = kut oko vertikale (0 = sprijeda), ph = nagib, half = širina kadra [mm]
-const FOK={sve:{th:-0.55,ph:1.08},vrata:{th:0,ph:1.38},straga:{th:Math.PI,ph:1.38},lijevo:{th:-Math.PI/2,ph:1.38,half:D+CFG.prepust+900},desno:{th:Math.PI/2,ph:1.38,half:D+CFG.prepust+900}};
+const FOK={sve:{th:-0.55,ph:1.08},vrata:{th:0,ph:1.38},straga:{th:Math.PI,ph:1.38},lijevo:{th:-Math.PI/2,ph:1.38,half:D+CFG.prepust+1400,tx:0},desno:{th:Math.PI/2,ph:1.38,half:D+CFG.prepust+1400,tx:L}};   // tx = točka gledanja po x (bok)
 let anim=null;
 function focusPloha(k){const f=FOK[k];if(!f||!cam)return;document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',k==='sve'&&b.dataset.v==='iso'));
   const r0=sph.r,th0=sph.th,ph0=sph.ph,t0=tgt.clone(),ht=sph.half;sph.half=f.half;sph.r0=0;fit();const r1=sph.r;sph.r=r0;sph.half=ht;
   let dth=((f.th-th0)%(2*Math.PI)+3*Math.PI)%(2*Math.PI)-Math.PI;   // najkraći put
-  anim={t:0,dur:0.7,th0,dth,ph0,dph:f.ph-ph0,r0,dr:r1-r0,t0,t1:new THREE.Vector3(L/2,gy(L/2)+800,D/2+150),half:f.half}}
+  anim={t:0,dur:0.7,th0,dth,ph0,dph:f.ph-ph0,r0,dr:r1-r0,t0,t1:new THREE.Vector3(f.tx??L/2,gy(f.tx??L/2)+800,D/2+150),half:f.half}}
 function setRoof(v){showRoof=v;$('bKrov').setAttribute('aria-pressed',v);const r=root&&root.getObjectByName('krov');if(r)r.visible=v}
 function group(id,arr,key){const e=$(id);e.innerHTML='';arr.forEach(([v,t])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',cfg[key]==v);
   b.onclick=()=>{cfg[key]=v;if(key==='pl'){ui();focusPloha(v);return}if(key==='n'){cfg.r=0;cur=[]}else cur=leaves.map(l=>l.x);ui();build()};e.appendChild(b)})}
