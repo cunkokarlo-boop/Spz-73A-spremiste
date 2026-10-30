@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="hr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Spremište za kontejnere · 4,0 m</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef0ef;--panel:#fff;--fg:#1a1f22;--mut:#56626a;--line:#d3d8d7;--scene:#dfe4e3;--acc:#2d5d62;--f:"IBM Plex Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#121618;--panel:#1a2023;--fg:#e6eaeb;--mut:#9aa6ab;--line:#2d3538;--scene:#2a3134;--acc:#5aa3a9;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 var(--f)}
+.wrap{max-width:1180px;margin:0 auto;padding:12px max(14px,env(safe-area-inset-right)) 36px max(14px,env(safe-area-inset-left));display:grid;gap:12px}
+h1{font-size:20px;margin:0;font-weight:600}h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:0 0 8px;font-weight:600}
+.lay{display:grid;gap:12px}
+@media (min-width:900px){.lay{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start}.side{max-height:calc(100svh - 70px);overflow:auto}}
+.stage{position:relative;height:clamp(340px,calc(100svh - 300px),620px);background:var(--scene);border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:none}
+@media (max-width:899px){.stage{position:sticky;top:0;z-index:2;height:46svh;min-height:300px}}
+@media (min-width:900px){.stage{position:sticky;top:10px;height:min(640px,calc(100svh - 80px))}}
+.stage canvas{display:block;width:100%;height:100%}
+.hint{transition:opacity .6s;position:absolute;left:10px;top:10px;font-size:13px;color:var(--mut);background:var(--panel);padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+.doors{position:absolute;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:8px;max-width:calc(100% - 16px)}
+.doors button{font:600 16px var(--f);min-height:48px;padding:10px 16px;border-radius:999px;border:0;background:var(--acc);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:nowrap}
+.doors button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+@media (max-width:420px){.doors button{font-size:15px;padding:10px 12px}}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.side{display:grid;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.row button{font:inherit;font-size:16px;min-height:48px;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:8px 14px;border-radius:999px;cursor:pointer;text-align:left}
+.row button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.opis{margin:0}.err{padding:20px;color:var(--mut)}
+.top{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.help{flex:none;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:600 20px var(--f);cursor:pointer}
+[hidden]{display:none!important}
+.primjer{display:inline-block;margin-left:8px;font-size:12px;letter-spacing:0;text-transform:none;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-weight:400}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}td.n,th.n{text-align:right;white-space:nowrap}
+tr.tot td{font-weight:600;border-bottom:0}.mut{color:var(--mut);font-size:14px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--fg);color:var(--bg);padding:10px max(14px,env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;gap:10px;align-items:center;font-weight:600}
+.bar button{white-space:nowrap;font:600 15px var(--f);min-height:44px;padding:8px 14px;border-radius:999px;border:0;background:var(--acc);color:#fff}
+body{padding-bottom:76px}
+@media (max-width:899px){#cij{scroll-margin-top:calc(46svh + 12px)}}
+.dlg{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}.dlg.on{display:flex}
+.dlg .in{background:var(--panel);color:var(--fg);border-radius:12px;max-width:440px;width:100%;padding:16px;display:grid;gap:10px}
+.dlg ol{margin:0;padding-left:22px;display:grid;gap:8px}.dlg button{justify-self:end;font:600 16px var(--f);min-height:48px;padding:10px 18px;border-radius:999px;border:0;background:var(--acc);color:#fff}
+.send{display:grid;gap:8px}.send a,.send button{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:999px;font:600 16px var(--f);text-decoration:none;border:0;cursor:pointer}
+.send .mail{background:var(--acc);color:#fff}.send .wa{background:#1f7a4a;color:#fff}.send .cp{background:var(--panel);color:var(--fg);border:1px solid var(--line)}
+.sdlg{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;padding:12px}.sdlg.on{display:flex}
+.sdlg .in{background:var(--panel);color:var(--fg);border-radius:14px;max-width:460px;width:100%;padding:16px;display:grid;gap:10px}
+.sdlg pre{white-space:pre-wrap;font:14px/1.4 var(--f);background:var(--bg);border-radius:8px;padding:10px;margin:0;max-height:34svh;overflow:auto}
+.sbtn{font:600 16px var(--f);min-height:52px;padding:10px 18px;border-radius:999px;border:0;background:var(--acc);color:#fff;cursor:pointer;width:100%}
+.zag{background:#000;border-bottom:2px solid #e02020;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;flex-wrap:wrap}
+.zag img{height:44px;width:auto;display:block}
+.zag .kont{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:14px;color:#c9c9cc;justify-content:flex-end}.zag .kont a{color:#fff;text-decoration:none;font-weight:600}
+</style></head><body>
+<div class="wrap">
+<header class="zag" id="zag" aria-label="Zaglavlje"><img id="zLogo" alt=""><div class="kont" id="kont"></div></header>
+<div class="top"><h1>Spremište za kontejnere · 4,0 × 1,4 m · klizna vrata</h1><button class="help" id="bHelp" type="button" aria-label="Pomoć">?</button></div>
+<div class="lay">
+ <div class="stage" id="stage"><div class="hint" id="hint">vrti prstom · dva prsta zoom</div>
+  <div class="doors" role="group" aria-label="Vrata">
+   <button type="button" data-d="L" aria-pressed="false">Otvori lijevo</button>
+   <button type="button" data-d="D" aria-pressed="false">Otvori desno</button>
+   <button type="button" data-d="zat" aria-pressed="true">Zatvori</button>
+  </div></div>
+ <div class="side">
+  <div class="box"><h2>Ispuna stijena i vrata</h2><div class="row" id="g-pl" aria-label="Ploha"></div><div class="row" id="g-isp" style="margin-top:8px" aria-label="Uzorak"></div><p class="opis" id="o-isp" style="margin-top:8px"></p></div>
+  <div class="box"><h2>Vrata</h2><div class="row" id="g-n"></div></div>
+  <div class="box"><h2>Raspored unutra</h2><div class="row" id="g-r"></div><p class="opis" id="o-r" style="margin-top:8px"></p></div>
+  <div class="box"><h2>Pogled</h2><div class="row">
+   <button type="button" data-v="iso" aria-pressed="true">3D</button><button type="button" data-v="front" aria-pressed="false">Sprijeda</button><button type="button" data-v="top" aria-pressed="false">Odozgo</button>
+   <button type="button" id="bKrov" aria-pressed="true">Krov</button><button type="button" id="bKo" aria-pressed="true">Posude</button></div></div>
+  <section class="box" id="cij"><h2>Informativna cijena<span class="primjer" id="primjer">primjer cijena</span></h2><table id="tCij"></table><p class="mut" id="nCij" style="margin:8px 0 0"></p></section>
+<section class="box"><h2>Ukratko</h2><ul id="ukr"></ul></section>
+ </div>
+</div></div>
+<div class="bar" role="status"><span id="barTxt" role="button" tabindex="0" style="cursor:pointer"></span><span style="display:flex;gap:6px"><button type="button" id="bShare" style="background:transparent;border:1px solid currentColor;color:inherit">Dijeli</button><button type="button" id="bPon">Zatraži ponudu</button></span></div>
+<div class="sdlg" id="sdlg" role="dialog" aria-modal="true" aria-labelledby="sT"><div class="in"><h2 id="sT">Dijeli varijantu</h2>
+<div class="row" id="sCijRow" role="group" aria-label="Cijena u poruci"><button type="button" data-sc="1" aria-pressed="true">S cijenom</button><button type="button" data-sc="0" aria-pressed="false">Bez cijene</button></div>
+<pre id="sTxt"></pre><div class="send"><button type="button" class="mail" id="sShare">Dijeli…</button><a class="wa" id="sWa" href="#" target="_blank" rel="noopener">WhatsApp</a><a class="cp" id="sMail" href="#">E-mail</a><button type="button" class="cp" id="sCp">Kopiraj tekst</button></div>
+<p class="mut" id="sInfo" style="margin:0">Poveznica u poruci otvara upravo ovu varijantu. Ništa se ne sprema na poslužitelj.</p>
+<button type="button" class="cp" id="sZat" style="min-height:48px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:600 16px var(--f)">Zatvori</button></div></div>
+<div class="sdlg" id="pdlg" role="dialog" aria-modal="true" aria-labelledby="pT"><div class="in"><h2 id="pT">Zatraži ponudu</h2>
+<p class="mut" style="margin:0">Poruka s odabranom varijantom ide izravno izvođaču. Upišite ime, adresu objekta i telefon u poruku prije slanja.</p>
+<pre id="pTxt"></pre><div class="send"><a class="mail" id="pMail" href="#">Pošalji e-mailom</a><a class="wa" id="pWa" href="#" target="_blank" rel="noopener">Pošalji na WhatsApp</a><button type="button" class="cp" id="pCp">Kopiraj tekst</button></div>
+<p class="mut" id="pKont" style="margin:0"></p>
+<button type="button" class="cp" id="pZat" style="min-height:48px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:600 16px var(--f)">Zatvori</button></div></div>
+<div class="dlg" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dT"><div class="in"><h2 id="dT">Kako koristiti</h2><ol><li><b>Ispuna:</b> odaberi plohu (ili Sve plohe), pa uzorak. Svaka ploha može biti drugačija.</li><li><b>Vrata:</b> 3 ili 2 krila; gumbi na slici otvaraju lijevu ili desnu stranu.</li><li><b>Raspored:</b> što stoji unutra — kontejneri, kanta, vreće.</li><li><b>Cijena:</b> traka na dnu — dodirni iznos za stavke. „Dijeli” šalje varijantu (s cijenom ili bez), „Zatraži ponudu” piše izvođaču.</li></ol><p class="mut" style="margin:0">Pogled: 3D, sprijeda, odozgo. Krov i posude možeš sakriti.</p><button type="button" id="dOk">Razumijem</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ===================== ULAZI (uzorak: sve mjere ovdje) =====================
+const CFG={brend:'flash',L:4000,D:1400,nagib:2.5,                 // gabarit, kosina terena (desno niže)
+  stupW:80,stupD:40,straga:[0,1960,3920],sprijeda:[0,3920],
+  Nh:120,Nd:80,                                        // prednji nosač 120×80×3
+  yStraga:1980,yNapr:2060,prepust:500,                 // vrh kostura straga / vrh prednjeg nosača; prepust krova
+  lijevoVan:100,krilo1Fiksno:true,preklop:40,zazor:30,dno:60,unutraD:1320,
+  krilo:{z0:1430,t:40,gap:15,y0:90,y1:1890},
+  K:{w:1380,d:1190,h:1375},KA:{w:580,d:740,h:1070},V:330};
+// CIJENE bez PDV-a; primjer:true prikazuje oznaku „primjer cijena”.
+const CIJ={primjer:false,pdv:0.25,valuta:'€',
+  m2:{kostur:345,krov:55,mreza:60,perfo:90,lamele:115,kose:140},   // €/m² bez PDV-a
+  kom:{krilo:425},                                                  // sustav vrata po krilu (okvir, kotači, vodilice, boja)
+  fiksno:[['Brave s cilindrom (2 kom, isti ključ)',225],['Temelj (piloti)',635],['Prijevoz i montaža',595]]}; // null = po izmjeri
+const ISP={
+  mreza:{t:'Mreža',o:'Pocinčana mreža u okvirima: prozračno, svijetlo, sadržaj se vidi.'},
+  perfo:{t:'Perforirani lim',o:'Lim s rupicama u okvirima: zatvoreniji izgled, a zrak i dalje struji pa nema neugodnih mirisa.'},
+  lamele:{t:'Lamele',o:'Vodoravne čelične lamele s razmakom: zaklanjaju pogled, a spremište se prozračuje.'},
+ kose:{t:'Kose lamele',o:'Nagnute lamele (žaluzine): pogled ne prolazi ni izbliza, kiša ne ulazi, a zrak struji.'}};
+const PLOHE={sve:'Sve plohe',straga:'Straga',lijevo:'Lijevi bok',desno:'Desni bok',vrata:'Vrata'};
+// ===================== RASPORED (isti kao tlocrt) =====================
+const R0=CFG.stupW,R1=CFG.L-CFG.stupW;
+function wings(n){const o=CFG.preklop,a=R0-o,b=R1+o,p=Math.ceil((b-a+(n-1)*o)/n),zat=[...Array(n)].map((_,i)=>a+i*(p-o));
+  return {p,n,pos:{zat,L:zat.map(()=>b-p),D:zat.map(()=>CFG.krilo1Fiksno?a:-CFG.lijevoVan)}}}   // „Otvori lijevo” = krila složena desno
+const Kc=(x)=>({t:'K',x,z:CFG.dno,w:CFG.K.w,d:CFG.K.d}),KAc=(x,rot)=>rot?{t:'KA',x,z:CFG.dno,w:CFG.KA.d,d:CFG.KA.w,rot:1}:{t:'KA',x,z:CFG.dno,w:CFG.KA.w,d:CFG.KA.d};
+const Vc=(cx,cz)=>({t:'V',x:cx-CFG.V/2,z:cz-CFG.V/2,w:CFG.V,d:CFG.V});
+const kR=R1-CFG.zazor-CFG.K.w,kL=kR-CFG.zazor-CFG.K.w;
+const k1_2=Math.min(kL,wings(2).pos.L[0]-CFG.zazor-CFG.K.w);
+const LAY={
+ 3:[{t:'2 kontejnera + kanta + vreće',o:'Kanta stoji straga s ručkama uz bok, uz vrata ostaje prolaz za vreće. Svaki kontejner izlazi ravno van, bez micanja drugoga.',items:[Kc(kL),Kc(kR),KAc(110,1),Vc(265,1180),Vc(615,1180),Vc(905,805)]},
+    {t:'2 kontejnera + kanta ravno',o:'Kanta izlazi ravno, bez okretanja; uz nju cijelom dubinom mjesto za vreće.',items:[Kc(kL),Kc(kR),KAc(110),Vc(900,330),Vc(900,800),Vc(400,1180)]},
+    {t:'2 kontejnera + slobodan prostor',o:'Lijevo ostaje slobodan prostor za vreće ili kasnije još jednu kantu.',items:[Kc(kL),Kc(kR),Vc(300,330),Vc(300,800),Vc(750,330),Vc(750,800)]}],
+ 2:[{t:'2 kontejnera + vreće',o:'Dva šira krila. Svaki kontejner izlazi ravno van, vreće stoje uz kontejnere.',items:[Kc(k1_2),Kc(kR),Vc(300,330),Vc(300,800),Vc(2215,330),Vc(2215,800)]}]};
+// ===================== 3D =====================
+const $=id=>document.getElementById(id);
+const C={steel:0x3b4144,mesh:0x9aa3a8,lim:0x4a5054,perf:0x5b6266,brava:0xc9a227,whl:0x15181a,ground:0x6d7275,rub:0xb7b4ac,kont:0x7c8488,kanta:0x3e7a4b,vreca:0x2b2f31,rail:0x9aa3a8};
+const s=Math.tan(CFG.nagib*Math.PI/180),gy=x=>-s*x,L=CFG.L,D=CFG.D;
+let cfg={isp:{straga:'mreza',lijevo:'mreza',desno:'mreza',vrata:'mreza'},pl:'sve',n:3,r:0},want='zat',showRoof=true,showKo=true,last=0;
+const stage=$('stage');let renderer,scene,cam,root,leaves=[],tgt=new THREE.Vector3(),sph={r:7000,th:-0.55,ph:1.08},perfTex=null;
+function init(){
+  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){stage.insertAdjacentHTML('afterbegin','<div class="err">3D se ne može prikazati na ovom uređaju.</div>');return}
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));stage.prepend(renderer.domElement);
+  scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(38,1,5,60000);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x5d6870,.95));const dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(-2,4,3);scene.add(dl);
+  new ResizeObserver(resize).observe(stage);resize();controls();build();setView('iso');requestAnimationFrame(loop)}
+function resize(){if(!renderer)return;const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<500?52:38;cam.updateProjectionMatrix();fit()}
+function fit(){if(!cam)return;const half=(L+600)/2,f=Math.tan(cam.fov*Math.PI/360)*cam.aspect;sph.r=Math.max(sph.r0||0,half/f*1.15)}
+function quad(vs){const pos=[];for(let f=0;f<vs.length/4;f++){const q=vs.slice(f*4,f*4+4);[[0,1,2],[0,2,3]].forEach(t=>t.forEach(i=>pos.push(q[i][0],q[i][1],q[i][2])))}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();return g}
+const FACES=[[0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[3,2,6,7],[4,5,1,0]];
+const box8=P=>{const o=[];FACES.forEach(f=>f.forEach(i=>o.push(P[i])));return quad(o)};
+function sbox(x0,x1,y0,y1,z0,z1,flat){const a=flat?0:gy(x0),b=flat?0:gy(x1);return box8([[x0,y0+a,z0],[x1,y0+b,z0],[x1,y1+b,z0],[x0,y1+a,z0],[x0,y0+a,z1],[x1,y0+b,z1],[x1,y1+b,z1],[x0,y1+a,z1]])}
+function vbox(x0,x1,y0,y1,z0,z1){const g=gy((x0+x1)/2);return box8([[x0,y0+g,z0],[x1,y0+g,z0],[x1,y1+g,z0],[x0,y1+g,z0],[x0,y0+g,z1],[x1,y0+g,z1],[x1,y1+g,z1],[x0,y1+g,z1]])} // stup: okomit
+function zbox(x0,x1,z0,z1,ya0,ya1,yb0,yb1){const g=x=>gy(x);return box8([[x0,ya0+g(x0),z0],[x1,ya0+g(x1),z0],[x1,ya1+g(x1),z0],[x0,ya1+g(x0),z0],[x0,yb0+g(x0),z1],[x1,yb0+g(x1),z1],[x1,yb1+g(x1),z1],[x0,yb1+g(x0),z1]])}
+const mat=(c,o)=>new THREE.MeshLambertMaterial(Object.assign({color:c,side:THREE.DoubleSide},o||{}));
+const edge=g=>new THREE.LineSegments(new THREE.EdgesGeometry(g,20),new THREE.LineBasicMaterial({color:0,transparent:true,opacity:.22}));
+function addB(par,g,c,o,e){const m=new THREE.Mesh(g,mat(c,o));par.add(m);if(e!==false)par.add(edge(g));return m}
+function lines(par,p){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));par.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:C.mesh,transparent:true,opacity:.65})))}
+function perf(){if(perfTex)return perfTex;const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
+  g.fillStyle='#8d959a';g.fillRect(0,0,64,64);g.fillStyle='#262b2e';[[16,16],[48,48]].forEach(([x,y])=>{g.beginPath();g.arc(x,y,10,0,7);g.fill()});
+  perfTex=new THREE.CanvasTexture(c);perfTex.wrapS=perfTex.wrapT=THREE.RepeatWrapping;return perfTex}
+// ispuna u ravnini x–y (straga, krila): okvir t; flat = bez nagiba (krilo se pomiče u skupini)
+function infillX(par,x0,x1,y0,y1,z0,z1,t,col,isp){const zc=(z0+z1)/2;
+  [[x0,x0+t,y0,y1],[x1-t,x1,y0,y1],[x0+t,x1-t,y0,y0+t],[x0+t,x1-t,y1-t,y1]].forEach(([a,b,c,d])=>addB(par,sbox(a,b,c,d,z0,z1),col||C.steel));
+  const xa=x0+t,xb=x1-t,ya=y0+t,yb=y1-t;
+  if(isp==='mreza'){const p=[];for(let x=xa+50;x<xb;x+=50)p.push(x,gy(x)+ya,zc,x,gy(x)+yb,zc);for(let y=ya+50;y<yb;y+=50)p.push(xa,gy(xa)+y,zc,xb,gy(xb)+y,zc);lines(par,p)}
+  else if(isp==='perfo'){const t2=perf().clone();t2.needsUpdate=true;t2.repeat.set((xb-xa)/40,(yb-ya)/40);const geo=sbox(xa,xb,ya,yb,zc-1,zc+1);geo.setAttribute('uv',uvAx(geo,'X'));addB(par,geo,0xffffff,{map:t2},false)}
+  else if(isp==='kose'){for(let y=ya+5;y+80<=yb;y+=75){const P=(x,yy,z)=>[x,yy+gy(x),z];addB(par,box8([P(xa,y,zc+22),P(xb,y,zc+22),P(xb,y+80,zc-22),P(xa,y+80,zc-22),P(xa,y,zc+19),P(xb,y,zc+19),P(xb,y+80,zc-25),P(xa,y+80,zc-25)]),C.lim)}}
+else{for(let y=ya+10;y+70<=yb;y+=100)addB(par,sbox(xa,xb,y,y+70,zc-10,zc+10),C.lim)}}
+// ispuna u ravnini z–y (bokovi): vrh prati bočni nosač
+function infillZ(par,x0,x1,z0,z1,y0,ya,yb,t,isp,out){const k=(yb-ya)/(z1-z0),top=z=>ya+k*(z-z0),xc=(x0+x1)/2,g=gy(xc);
+  addB(par,zbox(x0,x1,z0,z0+t,y0,top(z0),y0,top(z0+t)),C.steel);addB(par,zbox(x0,x1,z1-t,z1,y0,top(z1-t),y0,top(z1)),C.steel);
+  addB(par,zbox(x0,x1,z0+t,z1-t,y0,y0+t,y0,y0+t),C.steel);addB(par,zbox(x0,x1,z0+t,z1-t,top(z0+t)-t,top(z0+t),top(z1-t)-t,top(z1-t)),C.steel);
+  const za=z0+t,zb=z1-t,y1a=top(za)-t,y1b=top(zb)-t,ya2=y0+t;
+  if(isp==='mreza'){const p=[];for(let z=za+50;z<zb;z+=50)p.push(xc,g+ya2,z,xc,g+top(z)-t,z);for(let y=ya2+50;y<Math.min(y1a,y1b);y+=50)p.push(xc,g+y,za,xc,g+y,zb);lines(par,p)}
+  else if(isp==='perfo'){const t2=perf().clone();t2.needsUpdate=true;t2.repeat.set((zb-za)/40,(Math.min(y1a,y1b)-ya2)/40);
+    const geo=zbox(xc-1,xc+1,za,zb,ya2,y1a,ya2,y1b);geo.setAttribute('uv',uvAx(geo,'Z'));addB(par,geo,0xffffff,{map:t2},false)}
+  else if(isp==='kose'){const o=out||1;for(let y=ya2+5;y+80<=Math.min(y1a,y1b);y+=75){const P=(x,yy,z)=>[x,yy+gy(x),z];addB(par,box8([P(xc+22*o,y,za),P(xc+22*o,y,zb),P(xc-22*o,y+80,zb),P(xc-22*o,y+80,za),P(xc+19*o,y,za),P(xc+19*o,y,zb),P(xc-25*o,y+80,zb),P(xc-25*o,y+80,za)]),C.lim)}}
+else{for(let y=ya2+10;y+70<=Math.min(y1a,y1b);y+=100)addB(par,zbox(xc-10,xc+10,za,zb,y,y+70,y,y+70),C.lim)}}
+function uvAx(geo,ax){const p=geo.attributes.position,uv=[],get=i=>ax==='X'?p.getX(i):p.getZ(i);let a0=1e9,a1=-1e9,y0=1e9,y1=-1e9;for(let i=0;i<p.count;i++){a0=Math.min(a0,get(i));a1=Math.max(a1,get(i));y0=Math.min(y0,p.getY(i));y1=Math.max(y1,p.getY(i))}
+  for(let i=0;i<p.count;i++)uv.push((get(i)-a0)/(a1-a0),(p.getY(i)-y0)/(y1-y0));return new THREE.Float32BufferAttribute(uv,2)}
+function build(){
+  if(!scene)return;if(root)scene.remove(root);root=new THREE.Group();scene.add(root);
+  const W=wings(cfg.n),lay=LAY[cfg.n][Math.min(cfg.r,LAY[cfg.n].length-1)],KR=CFG.krilo,zmax=KR.z0+W.n*(KR.t+KR.gap);
+  addB(root,sbox(-2600,L+2600,-90,-28,-200,2700),C.ground,{},false);
+  addB(root,sbox(-2600,L+2600,-28,90,-280,-120),C.rub,{},true);
+  const yS=CFG.yStraga,yN=CFG.yNapr,top=z=>yS+(yN-yS)*z/D;
+  // stupovi (okomiti): 3 straga, 2 sprijeda; vrh straga yS, sprijeda do dna nosača
+  CFG.straga.forEach(x=>addB(root,vbox(x,x+CFG.stupW,0,yS,0,CFG.stupD),C.steel));
+  CFG.sprijeda.forEach(x=>addB(root,vbox(x,x+CFG.stupW,0,yN-CFG.Nh,D-CFG.stupD,D),C.steel));
+  // prednji nosač 120×80, stražnja greda 80×40, bočne grede (koso), donje prečke
+  addB(root,sbox(0,L,yN-CFG.Nh,yN,D-CFG.Nd,D),C.steel);
+  addB(root,sbox(0,L,yS-80,yS,0,CFG.stupD),C.steel);
+  [0,L-40].forEach(x=>addB(root,zbox(x,x+40,CFG.stupD,D-CFG.Nd,top(CFG.stupD)-80,top(CFG.stupD),top(D-CFG.Nd)-80,top(D-CFG.Nd)),C.steel));
+  addB(root,sbox(CFG.stupW,L-CFG.stupW,0,80,0,CFG.stupD),C.steel);
+  [0,L-40].forEach(x=>addB(root,zbox(x,x+40,CFG.stupD,D-CFG.stupD,0,80,0,80),C.steel));
+  // krov: rogovi + trapezni lim, pad prema natrag, prepust naprijed
+  const roof=new THREE.Group();roof.name='krov';roof.visible=showRoof;root.add(roof);
+  const zr1=D+CFG.prepust,yr=z=>top(z)+0;
+  for(let i=0;i<5;i++){const x=Math.min(L-30,i*(L-30)/4);addB(roof,zbox(x,x+30,-20,zr1,yr(-20),yr(-20)+50,yr(zr1),yr(zr1)+50),C.steel)}
+  addB(roof,zbox(-40,L+40,-40,zr1+20,yr(-40)+52,yr(-40)+56,yr(zr1+20)+52,yr(zr1+20)+56),C.lim);
+  for(let x=-10;x<L+40;x+=200)addB(roof,zbox(x,Math.min(x+50,L+40),-40,zr1+20,yr(-40)+56,yr(-40)+88,yr(zr1+20)+56,yr(zr1+20)+88),C.lim);
+  // stijene: straga (2 polja), bokovi
+  for(let i=0;i<CFG.straga.length-1;i++){const xa=CFG.straga[i]+CFG.stupW,xb=CFG.straga[i+1];infillX(root,xa,xb,80,yS-80,-30,0,30,null,cfg.isp.straga)}
+  infillZ(root,-30,0,CFG.stupD,D-CFG.stupD,80,top(CFG.stupD)-80,top(D-CFG.stupD)-80,30,cfg.isp.lijevo,-1);
+  infillZ(root,L,L+30,CFG.stupD,D-CFG.stupD,80,top(CFG.stupD)-80,top(D-CFG.stupD)-80,30,cfg.isp.desno,1);
+  // podni nosač s jednom vodilicom (teleskop) i gornja vodilica na prednjem nosaču
+  const xo=-CFG.lijevoVan;addB(root,sbox(xo,L,0,40,D+10,zmax+10),C.steel);
+  {const len=Math.hypot(L-xo,s*(L-xo)),r=new THREE.Mesh(new THREE.CylinderGeometry(10,10,len,14),mat(C.rail));r.rotation.z=Math.PI/2-Math.atan(s);r.position.set((L+xo)/2,gy((L+xo)/2)+50,(KR.z0+zmax)/2);root.add(r)}
+  addB(root,sbox(xo,L,yN-CFG.Nh-30,yN-CFG.Nh,D,zmax+10),C.steel);
+  // krila
+  leaves=W.pos.zat.map((x0,i)=>{const g=new THREE.Group();root.add(g);const z=KR.z0+i*(KR.t+KR.gap);
+    infillX(g,0,W.p,KR.y0,KR.y1,z,z+KR.t,40,null,cfg.isp.vrata);
+if(i===0)addB(g,sbox(55,95,1000,1140,z+KR.t,z+KR.t+25),C.brava);if(i===W.n-1)addB(g,sbox(W.p-95,W.p-55,1000,1140,z+KR.t,z+KR.t+25),C.brava);
+    [90,W.p-90].forEach(x=>{const w=new THREE.Mesh(new THREE.CylinderGeometry(40,40,24,24),mat(C.whl));w.rotation.x=Math.PI/2;w.position.set(x,gy(x)+50,(KR.z0+zmax)/2);g.add(w)});
+    // skupina se crta od x=0 s nagibom; pomak po vodilici = (x, gy(x))
+    return {g,pos:W.pos,x:(cur[i]!==undefined?cur[i]:x0),i}});
+  leaves.forEach(l=>l.g.position.set(l.x,gy(l.x),0));
+  // posude (prate teren)
+  const kg=new THREE.Group();kg.name='kont';kg.visible=showKo;root.add(kg);
+  const put=(cx,cz)=>{const o=new THREE.Group();o.position.set(cx,gy(cx)-20,cz);o.rotation.z=-Math.atan(s);kg.add(o);return o};
+  const cyl=(g,r,len,x,y,z,c,rx)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,18),mat(c));if(rx)m.rotation.x=Math.PI/2;else m.rotation.z=Math.PI/2;m.position.set(x,y,z);g.add(m)};
+  const tb=(x0,x1,y0,y1,z0,z1,f)=>box8([[x0+f,y0,z0+f],[x1-f,y0,z0+f],[x1,y1,z0],[x0,y1,z0],[x0+f,y0,z1-f],[x1-f,y0,z1-f],[x1,y1,z1],[x0,y1,z1]]);
+  lay.items.forEach(o=>{const g=put(o.x+o.w/2,o.z+o.d/2),hw=o.w/2,hd=o.d/2;
+    if(o.t==='K'){const H=CFG.K.h;addB(g,tb(-hw+20,hw-20,150,H-70,-hd+40,hd-60,45),C.kont);addB(g,tb(-hw,hw,H-70,H,-hd+20,hd-40,0),C.kont);
+      [[-hw+120,-hd+140],[hw-120,-hd+140],[-hw+120,hd-160],[hw-120,hd-160]].forEach(([x,z])=>cyl(g,75,40,x,75,z,C.whl));cyl(g,14,o.w-200,0,H-260,hd-30,C.rail)}
+    else if(o.t==='KA'){const H=CFG.KA.h;addB(g,tb(-hw+15,hw-15,0,H-75,-hd+15,hd-15,30),C.kanta);addB(g,tb(-hw,hw,H-75,H-40,-hd,hd,0),C.kanta)}
+    else{const m=new THREE.Mesh(new THREE.CylinderGeometry(160,150,750,18),mat(C.vreca,{transparent:true,opacity:.75}));m.position.y=375;g.add(m)}});
+}
+let cur=[];
+function goalX(l){return l.pos[want][l.i]}
+function setDoor(d){want=d;document.querySelectorAll('[data-d]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===d))}
+function setView(v){document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+  if(v==='iso'){tgt.set(L/2,gy(L/2)+700,900);sph={r:7000,th:-0.55,ph:1.08}}
+  if(v==='front'){tgt.set(L/2,gy(L/2)+900,900);sph={r:6600,th:0,ph:1.5}}
+  if(v==='top'){tgt.set(L/2,0,900);sph={r:6400,th:0,ph:0.03};setRoof(false)}
+  sph.r0=sph.r;fit()}
+function setRoof(v){showRoof=v;$('bKrov').setAttribute('aria-pressed',v);const r=root&&root.getObjectByName('krov');if(r)r.visible=v}
+function group(id,arr,key){const e=$(id);e.innerHTML='';arr.forEach(([v,t])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',cfg[key]==v);
+  b.onclick=()=>{cfg[key]=v;if(key==='pl'){ui();return}if(key==='n'){cfg.r=0;cur=[]}else cur=leaves.map(l=>l.x);ui();build()};e.appendChild(b)})}
+function plohe(){const W=wings(cfg.n),yS=CFG.yStraga,yN=CFG.yNapr,top=z=>yS+(yN-yS)*z/D;
+  const straga=CFG.straga.slice(0,-1).reduce((a,x,i)=>a+(CFG.straga[i+1]-x-CFG.stupW)*(yS-160),0)/1e6;
+  const bok=(D-2*CFG.stupD)*((top(CFG.stupD)+top(D-CFG.stupD))/2-160)/1e6;
+  const vrata=W.n*W.p*(CFG.krilo.y1-CFG.krilo.y0)/1e6;
+  return {tlocrt:L*D/1e6,krov:(L+80)*(D+CFG.prepust+60)/1e6,straga,lijevo:bok,desno:bok,vrata,n:W.n}}
+const eur=v=>v==null?'po izmjeri':v.toLocaleString('hr-HR',{maximumFractionDigits:0})+' '+CIJ.valuta;
+function cijena(){const P=plohe(),rows=[];const add=(t,m2,c)=>rows.push([t,m2,c,m2==null?c:(c==null?null:m2*c)]);
+  add('Kostur (po m² tlocrta)',P.tlocrt,CIJ.m2.kostur);add('Krov od trapeznog lima',P.krov,CIJ.m2.krov);
+  [['straga','Straga'],['lijevo','Lijevi bok'],['desno','Desni bok'],['vrata','Vrata – ispuna']].forEach(([k,t])=>add(t+' · '+ISP[cfg.isp[k]].t.toLowerCase(),P[k],CIJ.m2[cfg.isp[k]]));
+  rows.push(['Sustav kliznih vrata ('+P.n+' krila)',null,null,CIJ.kom.krilo*P.n]);
+  CIJ.fiksno.forEach(([t,v])=>rows.push([t,null,null,v]));
+  const sum=rows.reduce((a,r)=>a+(r[3]||0),0),otv=rows.some(r=>r[3]==null);
+  $('tCij').innerHTML='<tr><th>Stavka</th><th class="n">m²</th><th class="n">Iznos</th></tr>'+rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]==null?'':r[1].toFixed(2).replace('.',',')}</td><td class="n">${eur(r[3])}</td></tr>`).join('')+
+   `<tr class="tot"><td>Ukupno bez PDV-a${otv?' (bez stavki po izmjeri)':''}</td><td></td><td class="n">${eur(sum)}</td></tr><tr><td>PDV ${CIJ.pdv*100} %</td><td></td><td class="n">${eur(sum*CIJ.pdv)}</td></tr><tr class="tot"><td>Ukupno s PDV-om</td><td></td><td class="n">${eur(sum*(1+CIJ.pdv))}</td></tr>`;
+  $('nCij').textContent='Informativna cijena, nije ponuda. Konačna nakon izmjere i potvrde mogućnosti izvedbe.';
+  $('barTxt').textContent='≈ '+eur(sum)+' bez PDV-a'+(otv?' + po izmjeri':'');$('primjer').hidden=!CIJ.primjer}
+function ui(){group('g-pl',Object.entries(PLOHE).map(([k,v])=>[k,v]),'pl');const sel=cfg.pl==='sve'?(new Set(Object.values(cfg.isp)).size===1?cfg.isp.straga:null):cfg.isp[cfg.pl];
+{const e=$('g-isp');e.innerHTML='';Object.entries(ISP).forEach(([k,v])=>{const b=document.createElement('button');b.type='button';b.textContent=v.t;b.setAttribute('aria-pressed',sel===k);b.onclick=()=>{(cfg.pl==='sve'?Object.keys(cfg.isp):[cfg.pl]).forEach(q=>cfg.isp[q]=k);cur=leaves.map(l=>l.x);ui();build()};e.appendChild(b)})}group('g-n',[[3,'3 krila'],[2,'2 krila']],'n');
+  const lays=LAY[cfg.n];group('g-r',lays.map((l,i)=>[i,l.t]),'r');const lay=lays[Math.min(cfg.r,lays.length-1)],W=wings(cfg.n);
+  const u=[...new Set(Object.values(cfg.isp))];$('o-isp').textContent=u.length===1?ISP[u[0]].o:'Kombinacija: '+Object.keys(cfg.isp).map(q=>PLOHE[q]+' – '+ISP[cfg.isp[q]].t.toLowerCase()).join(', ')+'.';$('o-r').textContent=lay.o;
+  $('ukr').innerHTML=['Gabarit 4,0 × 1,4 m, visina oko 2,0 m. Krov od trapeznog lima s prepustom 0,5 m nad ulazom i padom prema natrag, pa voda ne curi na ulaz.','Mjesto za dva kontejnera 1100 L'+(cfg.n===3?', kantu 240 L':'')+' i vreće.','Klizna vrata: '+W.n+' krila koja se slažu jedno iza drugog lijevo ili desno, pa se otvara strana koja treba. Svaki kontejner izlazi ravno van.','Prednja strana bez srednjeg stupa — cijela širina je slobodna za ulaz.','Čelična konstrukcija, ispuna u okvirima ('+u.map(k=>ISP[k].t.toLowerCase()).join(', ')+'). Konstrukcija prati nagib terena.','Zaključavanje: dvije brave s cilindrom na krajnjim krilima (zlatno), isti ključ za obje. Otključaš lijevu – otvara se lijeva strana, desnu – desna. Srednje krilo drže krajnja.'].map(t=>'<li>'+t+'</li>').join('');cijena()}
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>setDoor(b.dataset.d));
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+$('bKrov').onclick=()=>setRoof(!showRoof);
+$('bKo').onclick=()=>{showKo=!showKo;$('bKo').setAttribute('aria-pressed',showKo);const k=root&&root.getObjectByName('kont');if(k)k.visible=showKo};
+function controls(){const el=renderer.domElement,pts=new Map();let pd=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY})});
+  el.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;const o=pts.get(e.pointerId),dx=e.clientX-o.x,dy=e.clientY-o.y;
+    if(pts.size===1){sph.th-=dx*.008;sph.ph=Math.max(.03,Math.min(1.62,sph.ph-dy*.008))}pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2){const [p,q]=[...pts.values()],dd=Math.hypot(p.x-q.x,p.y-q.y);if(pd)sph.r=Math.max(300,Math.min(16000,sph.r*pd/dd));pd=dd}});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pd=0};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();sph.r=Math.max(300,Math.min(16000,sph.r*(1+e.deltaY*.001)))},{passive:false})}
+function loop(t){requestAnimationFrame(loop);const dt=last?Math.min(.05,(t-last)/1000):0;last=t;
+  leaves.forEach(l=>{const gx=goalX(l),dd=gx-l.x,v=900*dt;l.x+=Math.abs(dd)<=v?dd:Math.sign(dd)*v;l.g.position.set(l.x,gy(l.x),0)});
+  cam.position.set(tgt.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th),tgt.y+sph.r*Math.cos(sph.ph),tgt.z+sph.r*Math.sin(sph.ph)*Math.cos(sph.th));cam.lookAt(tgt);renderer.render(scene,cam)}
+ui();init();
+try{if(matchMedia('(pointer:fine)').matches)$('hint').textContent='vrti mišem · kotačić zoom';setTimeout(()=>{const h=$('hint');if(h)h.style.opacity='0'},6000)}catch(e){}
+{const dlg=$('dlg');$('bHelp').onclick=()=>dlg.classList.add('on');$('dOk').onclick=()=>dlg.classList.remove('on');dlg.onclick=e=>{if(e.target===dlg)dlg.classList.remove('on')};
+ $('barTxt').onclick=()=>$('cij').scrollIntoView({behavior:'smooth',block:'start'});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')dlg.classList.remove('on')})}
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setTimeout(()=>{if(want==='zat')setDoor('D')},1400);
+
+// ---- BREND ----
+const BRENDOVI={
+  flash:{naziv:'Flash Metal',logo:'data:image/png;base64,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',mail:'flash.metal@yahoo.com',tel:'385989565053',telTxt:'+385 98 956 5053'},
+};
+const BREND=BRENDOVI[CFG.brend||'flash'];
+$('zLogo').src=BREND.logo;$('zLogo').alt=BREND.naziv;
+$('kont').innerHTML=(BREND.mail?'<span><a href="mailto:'+BREND.mail+'">'+BREND.mail+'</a></span>':'')+(BREND.tel?'<span>Mob: <a href="tel:+'+BREND.tel+'">'+BREND.telTxt+'</a></span>':'');
+// ---- dijeli / zatraži ponudu: varijanta u poveznici (#v-...), s cijenom ili bez ----
+const KONTAKT=BREND;
+const ISK={mreza:'m',perfo:'p',lamele:'l',kose:'k'},ISK2=Object.fromEntries(Object.entries(ISK).map(([a,b])=>[b,a]));
+const IMA_CIJ=!!document.getElementById('cij');let sCij=true,skrivenaCij=false;
+function kod(sc){return 'v-'+cfg.n+cfg.r+'-'+['straga','lijevo','desno','vrata'].map(q=>ISK[cfg.isp[q]]).join('')+(IMA_CIJ&&!sc?'-b':'')}
+function izKoda(h){const m=/^#?v-([23])(\d)-([mplk]{4})(-b)?$/.exec(h||'');if(!m)return false;cfg.n=+m[1];cfg.r=Math.min(+m[2],LAY[cfg.n].length-1);
+  ['straga','lijevo','desno','vrata'].forEach((q,i)=>cfg.isp[q]=ISK2[m[3][i]]);skrivenaCij=!!m[4];return true}
+function opisV(sc){const lay=LAY[cfg.n][Math.min(cfg.r,LAY[cfg.n].length-1)];
+  return 'Vrata: '+cfg.n+' krila\nRaspored: '+lay.t+'\nStraga: '+ISP[cfg.isp.straga].t+'\nLijevi bok: '+ISP[cfg.isp.lijevo].t+'\nDesni bok: '+ISP[cfg.isp.desno].t+'\nVrata (ispuna): '+ISP[cfg.isp.vrata].t+
+   (IMA_CIJ&&sc?'\nInformativna cijena: '+$('barTxt').textContent+' (nije ponuda)':'')}
+const url=sc=>location.href.split('#')[0]+'#'+kod(sc);
+function dijeliTxt(){return 'Spremište za kontejnere 4,0 × 1,4 m — varijanta\n\n'+opisV(sCij)+'\n\nPogledaj u 3D: '+url(sCij)}
+function osvjeziDijeli(){const t=dijeliTxt();$('sTxt').textContent=t;$('sWa').href='https://wa.me/?text='+encodeURIComponent(t);
+  $('sMail').href='mailto:?subject='+encodeURIComponent('Spremište za kontejnere – varijanta')+'&body='+encodeURIComponent(t);
+  document.querySelectorAll('[data-sc]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.sc==='1')===sCij));$('sShare').hidden=!navigator.share}
+function ponudaTxt(){return 'Poštovani,\nmolim ponudu za spremište za kontejnere 4,0 × 1,4 m u ovoj varijanti:\n\n'+opisV(true)+'\n\nPogledaj u 3D: '+url(true)+'\n\nIme i prezime:\nAdresa objekta:\nTelefon:\n'}
+function otvori(id){$(id).classList.add('on')}function zatvori(){['sdlg','pdlg'].forEach(i=>$(i).classList.remove('on'))}
+$('bShare').onclick=()=>{$('sCijRow').hidden=!IMA_CIJ;osvjeziDijeli();otvori('sdlg')};
+$('bPon').hidden=!KONTAKT.mail&&!KONTAKT.tel;$('bPon').onclick=()=>{const t=ponudaTxt();$('pTxt').textContent=t;$('pMail').href='mailto:'+KONTAKT.mail+'?subject='+encodeURIComponent('Zahtjev za ponudu – spremište za kontejnere')+'&body='+encodeURIComponent(t);
+  $('pWa').href='https://wa.me/'+KONTAKT.tel+'?text='+encodeURIComponent(t);$('pKont').textContent='E-mail: '+KONTAKT.mail+' · Mob: '+KONTAKT.telTxt;otvori('pdlg')};
+document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{sCij=b.dataset.sc==='1';osvjeziDijeli()});
+$('sShare').onclick=async()=>{try{await navigator.share({title:'Spremište za kontejnere',text:dijeliTxt().replace(/\n\nPogledaj u 3D: .*$/,''),url:url(sCij)})}catch(e){}};
+const kopiraj=(btn,pre)=>async()=>{try{await navigator.clipboard.writeText($(pre).textContent);$(btn).textContent='Kopirano ✓'}catch(e){const r=document.createRange();r.selectNodeContents($(pre));const s=getSelection();s.removeAllRanges();s.addRange(r);$(btn).textContent='Označeno — kopirajte'}setTimeout(()=>$(btn).textContent='Kopiraj tekst',2500)};
+$('sCp').onclick=kopiraj('sCp','sTxt');$('pCp').onclick=kopiraj('pCp','pTxt');
+['sZat','pZat'].forEach(i=>$(i).onclick=zatvori);['sdlg','pdlg'].forEach(i=>$(i).onclick=e=>{if(e.target===$(i))zatvori()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')zatvori()});
+if(izKoda(location.hash)){cur=[];ui();build()}
+if(IMA_CIJ&&skrivenaCij){$('cij').hidden=true;$('barTxt').textContent='';}
+</script></body></html>
