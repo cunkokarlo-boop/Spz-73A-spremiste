@@ -135,7 +135,7 @@ function init(){
   scene.add(new THREE.HemisphereLight(0xffffff,0x5d6870,.95));const dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(-2,4,3);scene.add(dl);
   new ResizeObserver(resize).observe(stage);resize();controls();build();setView('iso');requestAnimationFrame(loop)}
 function resize(){if(!renderer)return;const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<500?52:38;cam.updateProjectionMatrix();fit()}
-function fit(){if(!cam)return;const half=(L+600)/2,f=Math.tan(cam.fov*Math.PI/360)*cam.aspect;sph.r=Math.max(sph.r0||0,half/f*1.15)}
+function fit(){if(!cam)return;const half=(sph.half||L+600)/2,f=Math.tan(cam.fov*Math.PI/360)*cam.aspect;sph.r=Math.max(sph.r0||0,half/f*1.15)}
 function quad(vs){const pos=[];for(let f=0;f<vs.length/4;f++){const q=vs.slice(f*4,f*4+4);[[0,1,2],[0,2,3]].forEach(t=>t.forEach(i=>pos.push(q[i][0],q[i][1],q[i][2])))}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();return g}
 const FACES=[[0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[3,2,6,7],[4,5,1,0]];
@@ -221,14 +221,21 @@ if(i===0)addB(g,sbox(55,95,1000,1140,z+KR.t,z+KR.t+25),C.brava);if(i===W.n-1)add
 let cur=[];
 function goalX(l){return l.pos[want][l.i]}
 function setDoor(d){want=d;document.querySelectorAll('[data-d]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===d))}
-function setView(v){document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+function setView(v){anim=null;sph.half=undefined;document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
   if(v==='iso'){tgt.set(L/2,gy(L/2)+700,900);sph={r:7000,th:-0.55,ph:1.08}}
   if(v==='front'){tgt.set(L/2,gy(L/2)+900,900);sph={r:6600,th:0,ph:1.5}}
   if(v==='top'){tgt.set(L/2,0,900);sph={r:6400,th:0,ph:0.03};setRoof(false)}
   sph.r0=sph.r;fit()}
+// pogled na plohu kod odabira ispune: th = kut oko vertikale (0 = sprijeda), ph = nagib, half = širina kadra [mm]
+const FOK={sve:{th:-0.55,ph:1.08},vrata:{th:0,ph:1.38},straga:{th:Math.PI,ph:1.38},lijevo:{th:-Math.PI/2,ph:1.38,half:D+CFG.prepust+900},desno:{th:Math.PI/2,ph:1.38,half:D+CFG.prepust+900}};
+let anim=null;
+function focusPloha(k){const f=FOK[k];if(!f||!cam)return;document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',k==='sve'&&b.dataset.v==='iso'));
+  const r0=sph.r,th0=sph.th,ph0=sph.ph,t0=tgt.clone(),ht=sph.half;sph.half=f.half;sph.r0=0;fit();const r1=sph.r;sph.r=r0;sph.half=ht;
+  let dth=((f.th-th0)%(2*Math.PI)+3*Math.PI)%(2*Math.PI)-Math.PI;   // najkraći put
+  anim={t:0,dur:0.7,th0,dth,ph0,dph:f.ph-ph0,r0,dr:r1-r0,t0,t1:new THREE.Vector3(L/2,gy(L/2)+800,D/2+150),half:f.half}}
 function setRoof(v){showRoof=v;$('bKrov').setAttribute('aria-pressed',v);const r=root&&root.getObjectByName('krov');if(r)r.visible=v}
 function group(id,arr,key){const e=$(id);e.innerHTML='';arr.forEach(([v,t])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',cfg[key]==v);
-  b.onclick=()=>{cfg[key]=v;if(key==='pl'){ui();return}if(key==='n'){cfg.r=0;cur=[]}else cur=leaves.map(l=>l.x);ui();build()};e.appendChild(b)})}
+  b.onclick=()=>{cfg[key]=v;if(key==='pl'){ui();focusPloha(v);return}if(key==='n'){cfg.r=0;cur=[]}else cur=leaves.map(l=>l.x);ui();build()};e.appendChild(b)})}
 function plohe(){const W=wings(cfg.n),yS=CFG.yStraga,yN=CFG.yNapr,top=z=>yS+(yN-yS)*z/D;
   const straga=CFG.straga.slice(0,-1).reduce((a,x,i)=>a+(CFG.straga[i+1]-x-CFG.stupW)*(yS-160),0)/1e6;
   const bok=(D-2*CFG.stupD)*((top(CFG.stupD)+top(D-CFG.stupD))/2-160)/1e6;
@@ -269,7 +276,7 @@ document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>setView(b.dataset
 $('bKrov').onclick=()=>setRoof(!showRoof);
 $('bKo').onclick=()=>{showKo=!showKo;$('bKo').setAttribute('aria-pressed',showKo);const k=root&&root.getObjectByName('kont');if(k)k.visible=showKo};
 function controls(){const el=renderer.domElement,pts=new Map();let pd=0;
-  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY})});
+  el.addEventListener('pointerdown',e=>{anim=null;el.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY})});
   el.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;const o=pts.get(e.pointerId),dx=e.clientX-o.x,dy=e.clientY-o.y;
     if(pts.size===1){sph.th-=dx*.008;sph.ph=Math.max(.03,Math.min(1.62,sph.ph-dy*.008))}pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(pts.size===2){const [p,q]=[...pts.values()],dd=Math.hypot(p.x-q.x,p.y-q.y);if(pd)sph.r=Math.max(300,Math.min(16000,sph.r*pd/dd));pd=dd}});
@@ -277,6 +284,8 @@ function controls(){const el=renderer.domElement,pts=new Map();let pd=0;
   el.addEventListener('wheel',e=>{e.preventDefault();sph.r=Math.max(300,Math.min(16000,sph.r*(1+e.deltaY*.001)))},{passive:false})}
 function loop(t){requestAnimationFrame(loop);const dt=last?Math.min(.05,(t-last)/1000):0;last=t;
   leaves.forEach(l=>{const gx=goalX(l),dd=gx-l.x,v=900*dt;l.x+=Math.abs(dd)<=v?dd:Math.sign(dd)*v;l.g.position.set(l.x,gy(l.x),0)});
+  if(anim){anim.t=Math.min(1,anim.t+dt/anim.dur);const e=anim.t<.5?2*anim.t*anim.t:1-Math.pow(-2*anim.t+2,2)/2;
+    sph.th=anim.th0+anim.dth*e;sph.ph=anim.ph0+anim.dph*e;sph.r=anim.r0+anim.dr*e;tgt.lerpVectors(anim.t0,anim.t1,e);if(anim.t>=1){sph.half=anim.half;sph.r0=sph.r;anim=null}}
   cam.position.set(tgt.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th),tgt.y+sph.r*Math.cos(sph.ph),tgt.z+sph.r*Math.sin(sph.ph)*Math.cos(sph.th));cam.lookAt(tgt);renderer.render(scene,cam)}
 ui();init();
 try{if(matchMedia('(pointer:fine)').matches)$('hint').textContent='vrti mišem · kotačić zoom';setTimeout(()=>{const h=$('hint');if(h)h.style.opacity='0'},6000)}catch(e){}
